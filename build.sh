@@ -189,7 +189,7 @@ if [ "$BACKUP_data" = true ]; then
         sleep 10
     fi
     
-    docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -a -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}_data.sql
+    sudo docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -a -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}_data.sql
     echo "Backup saved to: ./backups/${PROJECT_NAME}_backup_${USER_DATE}_data.sql"
 fi
 
@@ -208,13 +208,13 @@ if [ "$BACKUP_all" = true ]; then
     fi
     
     # Data only backup
-    docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -a -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}_data.sql
+    sudo docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -a -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}_data.sql
     
     # Full backup (schema + data)
-    docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}.sql
+    sudo docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}.sql
     
     # Clean backup (with drop statements)
-    docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -c -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}_clean.sql
+    sudo docker exec $DB_CONTAINER pg_dump -U $DB_USER $DB_NAME -c -O > ./backups/${PROJECT_NAME}_backup_${USER_DATE}_clean.sql
     
     echo "Backups saved:"
     echo "  - Data only: ./backups/${PROJECT_NAME}_backup_${USER_DATE}_data.sql"
@@ -254,8 +254,8 @@ if [ "$SOFT_REBUILD" = true ]; then
     
     # Remove static volume to ensure fresh files
     echo "Removing static volume for fresh files..."
-    docker volume rm ${PROJECT_NAME}_static_volume 2>/dev/null || true
-    docker volume rm ${PROJECT_NAME}_media_volume 2>/dev/null || true
+    sudo docker volume rm ${PROJECT_NAME}_static_volume 2>/dev/null || true
+    sudo docker volume rm ${PROJECT_NAME}_media_volume 2>/dev/null || true
     
     # Rebuild images
     echo "Rebuilding images..."
@@ -283,12 +283,12 @@ if [ "$REBUILD" = true ]; then
     
     # Remove volumes for fresh start
     echo "Removing volumes for fresh start..."
-    docker volume rm ${PROJECT_NAME}_static_volume 2>/dev/null || true
-    docker volume rm ${PROJECT_NAME}_postgres_data 2>/dev/null || true
-    docker volume rm ${PROJECT_NAME}_media_volume 2>/dev/null || true
+    sudo docker volume rm ${PROJECT_NAME}_static_volume 2>/dev/null || true
+    sudo docker volume rm ${PROJECT_NAME}_postgres_data 2>/dev/null || true
+    sudo docker volume rm ${PROJECT_NAME}_media_volume 2>/dev/null || true
     
     # Prune images
-    docker image prune -f
+    sudo docker image prune -f
     
     # Rebuild and start containers
     echo "Rebuilding and starting containers..."
