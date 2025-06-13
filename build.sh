@@ -279,7 +279,7 @@ if [ "$REBUILD" = true ]; then
     git pull
     
     echo "Stopping and removing all containers"
-    docker-compose down
+    sudo docker compose down
     
     # Remove volumes for fresh start
     echo "Removing volumes for fresh start..."
@@ -292,8 +292,8 @@ if [ "$REBUILD" = true ]; then
     
     # Rebuild and start containers
     echo "Rebuilding and starting containers..."
-    docker-compose build --no-cache
-    docker-compose up -d
+    sudo docker compose build --no-cache
+    sudo docker compose up -d
     
     # Wait for database to be ready
     echo "Waiting for containers to be ready..."
@@ -309,16 +309,16 @@ if [ "$MIGRATE" = true ]; then
     sleep 5
     
     # Collect static files
-    docker-compose exec web python manage.py collectstatic --noinput
+    sudo docker compose exec web python manage.py collectstatic --noinput
     
     # Make migrations
     echo "Making migrations..."
-    docker-compose exec web python manage.py makemigrations
-    docker-compose exec web python manage.py makemigrations timetrack
+    sudo docker compose exec web python manage.py makemigrations
+    sudo docker compose exec web python manage.py makemigrations timetrack
     
     # Apply migrations
     echo "Applying migrations..."
-    docker-compose exec web python manage.py migrate
+    sudo docker compose exec web python manage.py migrate
     
     echo "Migrations completed"
 fi
@@ -353,16 +353,16 @@ if [ "$SETUP" = true ]; then
     
     # Run migrations first
     echo "Running migrations..."
-    docker-compose exec web python manage.py makemigrations
-    docker-compose exec web python manage.py makemigrations timetrack
-    docker-compose exec web python manage.py migrate
+    sudo docker compose exec web python manage.py makemigrations
+    sudo docker compose exec web python manage.py makemigrations timetrack
+    sudo docker compose exec web python manage.py migrate
     
     # Collect static files
-    docker-compose exec web python manage.py collectstatic --noinput
+    sudo docker compose exec web python manage.py collectstatic --noinput
     
     # Create superuser
     echo "Creating superuser..."
-    docker-compose exec web python manage.py shell -c "
+    sudo docker compose exec web python manage.py shell -c "
 from django.contrib.auth.models import User
 if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser('admin', 'admin@timetracker.com', 'admin123')
@@ -373,7 +373,7 @@ else:
     
     # Create hour limits
     echo "Creating hour limits..."
-    docker-compose exec web python manage.py shell -c "
+    sudo docker compose exec web python manage.py shell -c "
 from timetrack.models import HourLimit
 if not HourLimit.objects.filter(period='weekly').exists():
     HourLimit.objects.create(period='weekly', max_hours=40)
