@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Pay Report - TimeTracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <h2><i class="bi bi-file-text"></i> Pay Report</h2>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="col-md-6 mb-3">
+        <div class="card stat-card">
+            <h3>{{ total_hours|floatformat:2 }}</h3>
+            <p class="text-muted mb-0">Total Hours</p>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card stat-card">
+            <h3>${{ total_pay|floatformat:2 }}</h3>
+            <p class="text-muted mb-0">Total Pay</p>
+        </div>
+    </div>
+
+    <!-- User Reports -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Pay Report: {{ start_date|date:"M d, Y" }} - {{ end_date|date:"M d, Y" }}</h5>
+            </div>
+            <div class="card-body">
+                {% for report in user_reports %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-6">
+                                <h6 class="mb-0">{{ report.user.username }}</h6>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="badge bg-primary">{{ report.total_hours|floatformat:2 }} hours</span>
+                                <span class="badge bg-success">${{ report.total_pay|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Clock In</th>
+                                        <th>Clock Out</th>
+                                        <th>Hours</th>
+                                        <th>Pay</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in report.entries %}
+                                    <tr>
+                                        <td>{{ entry.clock_in|date:"M d" }}</td>
+                                        <td>{{ entry.clock_in|date:"g:i A" }}</td>
+                                        <td>{{ entry.clock_out|date:"g:i A" }}</td>
+                                        <td>{{ entry.hours|floatformat:2 }}</td>
+                                        <td>${{ entry.pay|floatformat:2 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-info">
+                                        <th colspan="3">Total</th>
+                                        <th>{{ report.total_hours|floatformat:2 }}</th>
+                                        <th>${{ report.total_pay|floatformat:2 }}</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No time entries found for the selected date range.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

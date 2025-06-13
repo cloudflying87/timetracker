@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if entry %}Edit{% else %}Add{% endif %} Time Entry - TimeTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    {% if entry %}
+                        <i class="bi bi-pencil"></i> Edit Time Entry
+                    {% else %}
+                        <i class="bi bi-plus-circle"></i> Add Manual Time Entry
+                    {% endif %}
+                </h5>
+                {% if not entry %}
+                <small class="text-muted">Use this to add time if you forgot to clock in/out</small>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Save Entry
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

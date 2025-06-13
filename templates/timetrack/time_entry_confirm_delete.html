@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Time Entry - TimeTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-trash"></i> Delete Time Entry</h5>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to delete this time entry?</p>
+                <ul>
+                    <li><strong>Date:</strong> {{ entry.clock_in|date:"M d, Y" }}</li>
+                    <li><strong>Time:</strong> {{ entry.clock_in|date:"g:i A" }} - {{ entry.clock_out|date:"g:i A" }}</li>
+                    <li><strong>Duration:</strong> {{ entry.hours|floatformat:2 }} hours</li>
+                </ul>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete Entry
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

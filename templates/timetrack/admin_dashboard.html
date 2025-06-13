@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - TimeTracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <h2><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+    </div>
+
+    <!-- Hour Limits Overview -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Weekly Hours</h5>
+            </div>
+            <div class="card-body">
+                {% if weekly_limit %}
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar {% if week_usage_percent > 90 %}bg-danger{% elif week_usage_percent > 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ week_usage_percent|floatformat:0 }}%">
+                        {{ week_usage_percent|floatformat:0 }}%
+                    </div>
+                </div>
+                <p class="mb-0">
+                    <strong>{{ week_total_hours|floatformat:2 }}</strong> / {{ weekly_limit.max_hours }} hours used
+                </p>
+                {% else %}
+                <p class="text-muted">No weekly limit set</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Monthly Hours</h5>
+            </div>
+            <div class="card-body">
+                {% if monthly_limit %}
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar {% if month_usage_percent > 90 %}bg-danger{% elif month_usage_percent > 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ month_usage_percent|floatformat:0 }}%">
+                        {{ month_usage_percent|floatformat:0 }}%
+                    </div>
+                </div>
+                <p class="mb-0">
+                    <strong>{{ month_total_hours|floatformat:2 }}</strong> / {{ monthly_limit.max_hours }} hours used
+                </p>
+                {% else %}
+                <p class="text-muted">No monthly limit set</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pay Summary -->
+    <div class="col-md-6 mb-3">
+        <div class="card stat-card">
+            <h3>${{ total_week_pay|floatformat:2 }}</h3>
+            <p class="text-muted mb-0">Week Pay Total</p>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card stat-card">
+            <h3>${{ total_month_pay|floatformat:2 }}</h3>
+            <p class="text-muted mb-0">Month Pay Total</p>
+        </div>
+    </div>
+
+    <!-- Currently Active -->
+    {% if active_entries %}
+    <div class="col-12 mb-3">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock"></i> Currently Clocked In</h5>
+            </div>
+            <div class="card-body">
+                {% for entry in active_entries %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>
+                        <i class="bi bi-person"></i> {{ entry.user.username }}
+                        <small class="text-muted">(since {{ entry.clock_in|date:"g:i A" }})</small>
+                    </span>
+                    <span class="badge bg-info">{{ entry.hours|floatformat:2 }}h</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- User Statistics -->
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">User Statistics</h5>
+                <a href="{% url 'pay_report' %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-file-text"></i> Pay Report
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Week Hours</th>
+                                <th>Month Hours</th>
+                                <th>Rate</th>
+                                <th>Week Pay</th>
+                                <th>Month Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in users_stats %}
+                            <tr>
+                                <td>{{ stat.user.username }}</td>
+                                <td>{{ stat.week_hours|floatformat:2 }}</td>
+                                <td>{{ stat.month_hours|floatformat:2 }}</td>
+                                <td>${{ stat.hourly_rate }}</td>
+                                <td>${{ stat.week_pay|floatformat:2 }}</td>
+                                <td>${{ stat.month_pay|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Entries -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Time Entries</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Date</th>
+                                <th>Clock In</th>
+                                <th>Clock Out</th>
+                                <th>Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in recent_entries %}
+                            <tr>
+                                <td>{{ entry.user.username }}</td>
+                                <td>{{ entry.clock_in|date:"M d" }}</td>
+                                <td>{{ entry.clock_in|date:"g:i A" }}</td>
+                                <td>{{ entry.clock_out|date:"g:i A" }}</td>
+                                <td>{{ entry.hours|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

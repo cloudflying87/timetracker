@@ -1,0 +1,21 @@
+# Cloudflare Tunnel Configuration
+# Replace 'your-tunnel-name' with your actual tunnel name from Cloudflare dashboard
+
+tunnel: timetracker
+credentials-file: /etc/cloudflared/credentials.json
+
+# Ingress rules - route traffic to your services
+ingress:
+  # Route your domain to the nginx service
+  - hostname: timetracker.flyhomemnlab.com
+    service: http://nginx:80
+ 
+  
+  # Catch-all rule (required)
+  - service: http_status:404
+
+# Optional: Logging configuration
+loglevel: info
+
+# Optional: Metrics
+metrics: 0.0.0.0:2000

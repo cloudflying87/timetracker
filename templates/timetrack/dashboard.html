@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - TimeTracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Clock In/Out Section -->
+    <div class="col-12 mb-4">
+        {% if active_entry %}
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h4 class="text-success mb-3">
+                    <i class="bi bi-clock-fill"></i> Currently Working
+                </h4>
+                <p class="mb-2">Started at {{ active_entry.clock_in|date:"g:i A" }}</p>
+                <p class="mb-3">Duration: <span id="active-duration" class="fw-bold">{{ active_entry.hours|floatformat:2 }}</span> hours</p>
+                <a href="{% url 'clock_out' active_entry.id %}" class="btn btn-danger btn-lg">
+                    <i class="bi bi-stop-circle fs-4"></i><br>
+                    <span class="fs-5">CLOCK OUT</span>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h4 class="text-primary mb-3">Ready to Work</h4>
+                <a href="{% url 'clock_in' %}" class="btn btn-success btn-lg clock-button">
+                    <i class="bi bi-play-circle fs-1 d-block mb-2"></i>
+                    <span class="fs-4">CLOCK IN</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="col-6 mb-3">
+        <div class="card stat-card">
+            <h3>{{ week_hours|floatformat:2 }}</h3>
+            <p class="text-muted mb-0">Hours This Week</p>
+        </div>
+    </div>
+    <div class="col-6 mb-3">
+        <div class="card stat-card">
+            <h3>{{ month_hours|floatformat:2 }}</h3>
+            <p class="text-muted mb-0">Hours This Month</p>
+        </div>
+    </div>
+
+    <!-- Recent Time Entries -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Time Entries</h5>
+                <a href="{% url 'time_entry_create' %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus"></i> Add
+                </a>
+            </div>
+            <div class="card-body">
+                {% for entry in recent_entries %}
+                <div class="time-entry-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ entry.clock_in|date:"M d, Y" }}</strong><br>
+                            <small class="text-muted">
+                                {{ entry.clock_in|date:"g:i A" }} - 
+                                {% if entry.clock_out %}
+                                    {{ entry.clock_out|date:"g:i A" }}
+                                {% else %}
+                                    <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </small>
+                            {% if entry.description %}
+                            <br><small>{{ entry.description }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <strong>{{ entry.hours|floatformat:2 }}h</strong>
+                            <br>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'time_entry_edit' entry.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'time_entry_delete' entry.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No time entries yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if active_entry %}
+<script>
+    // Update active duration in real-time
+    const startTime = new Date("{{ active_entry.clock_in|date:'c' }}");
+    const durationElement = document.getElementById('active-duration');
+    
+    function updateDuration() {
+        const now = new Date();
+        const diff = now - startTime;
+        const hours = diff / (1000 * 60 * 60);
+        durationElement.textContent = hours.toFixed(2);
+    }
+    
+    setInterval(updateDuration, 60000); // Update every minute
+</script>
+{% endif %}
+{% endblock %}
