@@ -8,7 +8,7 @@ credentials-file: /etc/cloudflared/credentials.json
 ingress:
   # Route your domain to the nginx service
   - hostname: timetracker.flyhomemnlab.com
-    service: http://nginx:80
+    service: http://nginx:454
  
   
   # Catch-all rule (required)
