@@ -149,6 +149,15 @@ X_FRAME_OPTIONS = 'DENY'
 USE_TZ = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# CSRF settings for Cloudflare
+CSRF_TRUSTED_ORIGINS = [
+    'https://timetracker.flyhomemnlab.com',
+    'http://localhost:8000',
+    'http://localhost:8125',
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:8125',
+]
+
 # WhiteNoise for static files in production
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
