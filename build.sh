@@ -185,7 +185,7 @@ if [ "$BACKUP_data" = true ]; then
     # Check if container is running
     if ! docker ps | grep -q $DB_CONTAINER; then
         echo "Database container is not running. Starting containers..."
-        docker-compose up -d db
+        sudo docker compose up -d db
         sleep 10
     fi
     
@@ -203,7 +203,7 @@ if [ "$BACKUP_all" = true ]; then
     # Check if container is running
     if ! docker ps | grep -q $DB_CONTAINER; then
         echo "Database container is not running. Starting containers..."
-        docker-compose up -d db
+        sudo docker compose up -d db
         sleep 10
     fi
     
@@ -249,8 +249,8 @@ if [ "$SOFT_REBUILD" = true ]; then
     git pull
     
     echo "Stopping web and nginx containers (preserving database)"
-    docker-compose stop web nginx cloudflared 2>/dev/null || true
-    docker-compose rm -f web nginx cloudflared 2>/dev/null || true
+    sudo docker compose stop web nginx cloudflared 2>/dev/null || true
+    sudo docker compose rm -f web nginx cloudflared 2>/dev/null || true
     
     # Remove static volume to ensure fresh files
     echo "Removing static volume for fresh files..."
@@ -259,11 +259,11 @@ if [ "$SOFT_REBUILD" = true ]; then
     
     # Rebuild images
     echo "Rebuilding images..."
-    docker-compose build --no-cache web
+    sudo docker compose build --no-cache web
     
     # Start containers
     echo "Starting containers"
-    docker-compose up -d
+    sudo docker compose up -d
     
     # Wait for containers to be ready
     echo "Waiting for containers to be ready..."
@@ -419,14 +419,14 @@ if [ "$DEPLOY" = true ]; then
     
     # Deploy
     echo "Building and starting containers..."
-    docker-compose build --no-cache
-    docker-compose up -d
+    sudo docker compose build --no-cache
+    sudo docker compose up -d
     
     # Wait and run migrations
     echo "Waiting for containers and running migrations..."
     sleep 20
-    docker-compose exec web python manage.py migrate
-    docker-compose exec web python manage.py collectstatic --noinput
+    sudo docker compose exec web python manage.py migrate
+    sudo docker compose exec web python manage.py collectstatic --noinput
     
     echo "Production deployment completed!"
 fi
@@ -436,4 +436,4 @@ echo "TimeTracker build script completed successfully!"
 # Show container status
 echo ""
 echo "Container Status:"
-docker-compose ps
+sudo docker compose ps
